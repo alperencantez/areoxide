@@ -2,7 +2,6 @@ use serde_derive::Deserialize;
 use serde_derive::Serialize;
 use serde_json::Value;
 
-
 #[derive(Serialize)]
 pub struct RpcRequest<'a> {
     pub jsonrpc: &'a str,

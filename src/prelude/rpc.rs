@@ -1,6 +1,6 @@
+use reqwest::Client;
 use serde_json::Value;
 use std::error::Error;
-use reqwest::Client;
 
 use super::types::{AreonBlock, RpcRequest, RpcResponse};
 
@@ -45,7 +45,7 @@ impl RpcClient {
             params: vec![Value::String(address), Value::String("latest".to_string())],
             id: 1,
         };
-    
+
         let response: RpcResponse<String> = self
             .client
             .post(&self.rpc_url)
@@ -58,7 +58,6 @@ impl RpcClient {
         Ok(response.result)
     }
 
-
     pub async fn chain_id(&self) -> Result<String, Box<dyn Error>> {
         let request: RpcRequest<'_> = RpcRequest {
             jsonrpc: "2.0",
@@ -66,7 +65,7 @@ impl RpcClient {
             params: vec![],
             id: 1,
         };
-    
+
         let response: RpcResponse<String> = self
             .client
             .post(&self.rpc_url)
@@ -86,7 +85,7 @@ impl RpcClient {
             params: vec![],
             id: 1,
         };
-    
+
         let response: RpcResponse<String> = self
             .client
             .post(&self.rpc_url)
@@ -99,14 +98,18 @@ impl RpcClient {
         Ok(response.result)
     }
 
-    pub async fn get_block_by_number(&self, block_number: String, show_txs_in_detail: bool) -> Result<AreonBlock, Box<dyn Error>> {
+    pub async fn get_block_by_number(
+        &self,
+        block_number: String,
+        show_txs_in_detail: bool,
+    ) -> Result<AreonBlock, Box<dyn Error>> {
         let request: RpcRequest<'_> = RpcRequest {
             jsonrpc: "2.0",
             method: "eth_getBlockByNumber",
             params: vec![Value::String(block_number), Value::Bool(show_txs_in_detail)],
             id: 1,
         };
-    
+
         let response: RpcResponse<AreonBlock> = self
             .client
             .post(&self.rpc_url)
@@ -119,14 +122,18 @@ impl RpcClient {
         Ok(response.result)
     }
 
-    pub async fn get_block_by_hash(&self, block_hash: String, show_txs_in_detail: bool) -> Result<AreonBlock, Box<dyn Error>> {
+    pub async fn get_block_by_hash(
+        &self,
+        block_hash: String,
+        show_txs_in_detail: bool,
+    ) -> Result<AreonBlock, Box<dyn Error>> {
         let request: RpcRequest<'_> = RpcRequest {
             jsonrpc: "2.0",
             method: "eth_getBlockByHash",
             params: vec![Value::String(block_hash), Value::Bool(show_txs_in_detail)],
             id: 1,
         };
-    
+
         let response: RpcResponse<AreonBlock> = self
             .client
             .post(&self.rpc_url)
@@ -138,6 +145,4 @@ impl RpcClient {
 
         Ok(response.result)
     }
-
-
 }

@@ -1,4 +1,4 @@
-use alloy::primitives::{U256, Uint, ruint};
+use alloy::primitives::{ruint, Uint, U256};
 
 /// Converts a hexadecimal string (with "0x" prefix) to a decimal `U256`.
 ///
