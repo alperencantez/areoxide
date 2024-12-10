@@ -2,7 +2,7 @@ use reqwest::Client;
 use serde_json::Value;
 use std::error::Error;
 
-use super::types::{AreonBlock, RpcRequest, RpcResponse};
+use super::types::*;
 
 pub struct RpcClient {
     rpc_url: String,
@@ -141,6 +141,96 @@ impl RpcClient {
             .send()
             .await?
             .json::<RpcResponse<AreonBlock>>()
+            .await?;
+
+        Ok(response.result)
+    }
+
+    pub async fn get_transaction_by_hash(&self, tx_hash: String) -> Result<AreonTx, Box<dyn Error>> {
+        let request: RpcRequest<'_> = RpcRequest {
+            jsonrpc: "2.0",
+            method: "eth_getTransactionByHash",
+            params: vec![Value::String(tx_hash)],
+            id: 1,
+        };
+
+        let response: RpcResponse<AreonTx> = self
+            .client
+            .post(&self.rpc_url)
+            .json(&request)
+            .send()
+            .await?
+            .json::<RpcResponse<AreonTx>>()
+            .await?;
+
+        Ok(response.result)
+    }
+
+    pub async fn get_transaction_receipt(&self, tx_hash: String) -> Result<AreonTxReceipt, Box<dyn Error>> {
+        let request: RpcRequest<'_> = RpcRequest {
+            jsonrpc: "2.0",
+            method: "eth_getTransactionReceipt",
+            params: vec![Value::String(tx_hash)],
+            id: 1,
+        };
+
+        let response: RpcResponse<AreonTxReceipt> = self
+            .client
+            .post(&self.rpc_url)
+            .json(&request)
+            .send()
+            .await?
+            .json::<RpcResponse<AreonTxReceipt>>()
+            .await?;
+
+        Ok(response.result)
+    }
+
+    /// Retrieves the bytecode of a smart contract from Areon Network.
+    ///
+    /// # Parameters
+    /// - `address`: The address of the smart contract in hexadecimal format (e.g., `"0x1234..."`).
+    /// - `block_tag`: Specifies the block context:
+    ///   - `"latest"`: Use the latest block.
+    ///   - `"earliest"`: Use the genesis block.
+    ///   - `"pending"`: Use the pending state.
+    ///   - `"safe"`: Use the safe state.
+    ///   - `"finalized"`: Use the finalized state.
+    ///   - A block number as a hexadecimal string (e.g., `"0x10"`).
+    ///
+    /// # Returns
+    /// - `Ok(String)`: The bytecode of the contract as a hexadecimal string.
+    /// - `Err(String)`: An error message if the request fails or the contract doesn't exist.
+    ///
+    /// # Example
+    /// ```
+    /// let client = areoxide::prelude::RpcClient::init("<RPC_URL>");
+    /// let address = "0x1234567890abcdef1234567890abcdef12345678";
+    /// let block_tag = Some("latest");
+    /// match client::get_code(address, block_tag) {
+    ///     Ok(bytecode) => println!("Contract bytecode: {}", bytecode),
+    ///     Err(e) => eprintln!("Failed to retrieve bytecode: {}", e),
+    /// }
+    /// ```
+    ///
+    /// # Notes
+    /// - If the address doesn't contain a contract, the function returns an `0x` string.
+    /// - Ensure the node you're querying supports the `eth_getCode` RPC method.
+    pub async fn get_code(&self, address: String, block: String) -> Result<String, Box<dyn Error>> {
+        let request: RpcRequest<'_> = RpcRequest {
+            jsonrpc: "2.0",
+            method: "eth_getCode",
+            params: vec![Value::String(address), Value::String(block)],
+            id: 1,
+        };
+
+        let response: RpcResponse<String> = self
+            .client
+            .post(&self.rpc_url)
+            .json(&request)
+            .send()
+            .await?
+            .json::<RpcResponse<String>>()
             .await?;
 
         Ok(response.result)

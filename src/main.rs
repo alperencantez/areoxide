@@ -1,4 +1,4 @@
-use areoxide::prelude::{rpc::RpcClient, util};
+use areoxide::prelude::{constants, rpc::RpcClient, util};
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() {
@@ -53,5 +53,33 @@ async fn test_drive() {
     match client.gas_price().await {
         Ok(gas) => println!("Gas Price: {:#?}", util::hexadecimal_str_to_decimal_str(gas).unwrap()),
         Err(e) => eprintln!("Error fetching gas price: {}", e),
+    }
+
+    match client
+        .get_transaction_by_hash("0x05ac269811b4ff3faa7f64466db468adbefbf5231b5d4946b9aa82bbf293ff52".to_string())
+        .await
+    {
+        Ok(tx) => println!("Tx detail by hash: {:#?}", tx),
+        Err(e) => eprintln!("Error fetching tx: {}", e),
+    }
+
+    match client
+        .get_transaction_receipt("0x05ac269811b4ff3faa7f64466db468adbefbf5231b5d4946b9aa82bbf293ff52".to_string())
+        .await
+    {
+        Ok(receipt) => println!("Tx detail receipt: {:#?}", receipt),
+        Err(e) => eprintln!("Error fetching tx receipt: {}", e),
+    }
+
+    match client
+        .get_code(
+            "0x6e226c9bab32be96ff2bc7da14a2bdf1f026045f".to_string(),
+            constants::BLOCK_STATE_LATEST.to_string(),
+            // util::decimal_str_to_hexadecimal_str("42".to_string()).unwrap(),
+        )
+        .await
+    {
+        Ok(code) => println!("Address code: {:#?}", code),
+        Err(e) => eprintln!("Error fetching code: {}", e),
     }
 }
